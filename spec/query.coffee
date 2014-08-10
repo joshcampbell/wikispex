@@ -10,7 +10,7 @@ describe "Query", ->
     it "creates a well-formed URL", ->
       actual = @query.url()
       expected = "https://en.wikipedia.org/w/api.php?format=json&action=help"
-      assert.equal(actual, expected)
+      assert(actual.indexOf(expected) == 0)
 
     it "includes options passed to the constructor", ->
       @query = new Query(action: "delete")

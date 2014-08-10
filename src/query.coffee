@@ -1,4 +1,5 @@
 Spine = require "spine"
+$ = jQuery = require "jquery"
 _ = require "lodash"
 
 class Query extends Spine.Module
@@ -9,10 +10,19 @@ class Query extends Spine.Module
   BASE_OPTIONS:
     format: "json"
     action: "help"
+    callback: "?" # (because mediawiki sites don't use CORS)
+    # If they did, we could use a native XHR object instead
+    # of shoving in jquery so we don't have to reimplement jsonp
+    # support.
 
   constructor: (@options={}) ->
-  url: -> @BASE_URL + @url_encode(@full_options())
-  perform: -> @xhr().send()
+  url: => @BASE_URL + @url_encode(@full_options())
+  perform: => $.ajax({
+    dataType: "json"
+    url: @url()
+    success: @publish("success")
+    error: @publish("error")
+  })
 
   # "private"
   options: -> {} #override me in child classes?
@@ -23,13 +33,6 @@ class Query extends Spine.Module
       .reduce(((memo, pair) ->
         if memo == "?" then memo + pair else memo + "&" + pair),
         "?").value()
-  xhr: =>
-    xhr = new XMLHttpRequest()
-    xhr.onerror = @publish("error")
-    xhr.onload = @publish("complete")
-    xhr.onprogress = @publish("progress")
-    xhr.open("GET", @url(), true)
-    xhr
   publish: (message) => (args...) =>
     @trigger.apply(@, [message].concat(args))
 
