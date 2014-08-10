@@ -7,7 +7,7 @@ describe "Query", ->
     @query = new Query()
 
   describe "#url", ->
-    it "creates a well-formed URL", ->
+    it "creates a well-formed URL (brittle test)", ->
       actual = @query.url()
       expected = "https://en.wikipedia.org/w/api.php?format=json&action=help"
       assert(actual.indexOf(expected) == 0)
@@ -34,4 +34,4 @@ describe "Query", ->
       @query.bind("message", spy)
       callback("foo", "bar")
       assert(spy.calledOnce)
-      assert(spy.calledWith("foo", "bar"))
+      assert(spy.calledWith("foo"))

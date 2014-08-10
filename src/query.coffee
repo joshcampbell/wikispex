@@ -1,6 +1,6 @@
 Spine = require "spine"
-$ = jQuery = require "jquery"
 _ = require "lodash"
+$ = jQuery = require "jquery"
 
 class Query extends Spine.Module
   @include(Spine.Events)
@@ -33,7 +33,6 @@ class Query extends Spine.Module
       .reduce(((memo, pair) ->
         if memo == "?" then memo + pair else memo + "&" + pair),
         "?").value()
-  publish: (message) => (args...) =>
-    @trigger.apply(@, [message].concat(args))
+  publish: (message) => (data) => @trigger(message, data)
 
 module.exports = Query

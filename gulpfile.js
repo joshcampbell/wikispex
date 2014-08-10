@@ -17,11 +17,11 @@ gulp.task("tdd", function(){
 
 gulp.task("test", function(){
   return gulp.src(SPEC_FILES)
-    .pipe(mocha({reporter: 'nyan'}))
+    .pipe(mocha({reporter: 'spec'}))
 })
 
 gulp.task('serve', ['build', 'start-server', 'watch'])
-gulp.task('build', ['copy-pages', 'copy-libs', 'coffee'])
+gulp.task('build', ['copy-pages', 'copy-libs', 'coffee', 'browserify'])
 
 
 gulp.task("coffee", function(){
@@ -29,6 +29,9 @@ gulp.task("coffee", function(){
     .pipe(coffee({ bare: true }).on("error", gutil.log))
     .pipe(gulp.dest('./js/'))
 
+})
+
+gulp.task("browserify", function(){
   gulp.src('./js/app.js')
     .pipe(browserify({ insertGlobals: true }))
     .pipe(gulp.dest('./build/'))

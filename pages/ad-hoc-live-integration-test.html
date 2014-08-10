@@ -3,13 +3,28 @@
     <script type="text/javascript" src="./app.js"></script>
   </head>
 <body>
-<script type="text/javascript">
-$(function(){
-    console.log("OK")
-    query = new WS.Query
-    query.bind("success", function(){ console.log(arguments[0].error["*"]) })
-    query.perform()
-});
- </script>
 </body>
+<ul>
+<li>
+    query = new WS.Query;
+    query.bind("success", function(){ console.log(arguments[0].error["*"]) });
+    query.perform();
+</li>
+<li>
+    query = new WS.RevisionQuery({title: "Charizard"});
+    query.bind("success", function(){ console.log(arguments) });
+    query.perform();
+</li>
+<li>
+    query = new WS.RevisionQuery({title: "Charizard"});
+    query.bind("success", function(){ console.log(arguments) });
+    query.bind("progress", function(args){ console.log(args.progress + " / " + args.total) });
+    query.perform();
+</li>
+<li>
+    revisions = WS.RevisionList.create({title: "Charizard"});
+    revisions.bind("ready", function(){ console.log(arguments) });
+    revisions.populate();
+</li>
+</ul>
 </html>

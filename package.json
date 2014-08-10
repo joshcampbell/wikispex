@@ -1,5 +1,5 @@
 {
-  "name": "wikispy",
+  "name": "wikispex",
   "version": "0.0.1",
   "description": "A JS Library for talking to the MediaWiki API",
   "dependencies": {
