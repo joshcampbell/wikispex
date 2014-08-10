@@ -29,9 +29,9 @@ gulp.task("coffee", function(){
     .pipe(coffee({ bare: true }).on("error", gutil.log))
     .pipe(gulp.dest('./js/'))
 
-  gulp.src('./build/app.js')
+  gulp.src('./js/app.js')
     .pipe(browserify({ insertGlobals: true }))
-    .pipe(gulp.dest('./build/js'))
+    .pipe(gulp.dest('./build/'))
 })
 
 gulp.task("copy-pages", function(){
