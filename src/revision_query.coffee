@@ -7,8 +7,8 @@ class RevisionQuery extends Spine.Module
   # PUBLISHES:
   # - "success" when all subsidiary requests are complete
 
-  REVISION_PROPERTIES = [ "timestamp", "user", "size", "comment", "flags", "tags", "ids", "content"
-  ]
+  REVISION_PROPERTIES = [ "timestamp", "user", "size", "comment", "flags",
+			  "tags", "ids", "content" ]
 
   BASE_OPTIONS =
     action: "query"

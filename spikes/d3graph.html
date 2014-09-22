@@ -1,0 +1,41 @@
+<html>
+<head>
+<script type="application/javascript" src="lodash.underscore.js"></script>
+<script type="application/javascript" charset="utf-8" src="../src/d3.js"></script>
+<script type="application/javascript" src="../src/dimple.v2.1.0.js"></script>
+</head>
+<body>
+<div id="graph"></div>
+<script type="application/javascript">
+  // create some sample data
+	var days_ago = function(days){
+		ms_offset = 86400000 * days
+		return (new Date() - ms_offset)
+  }
+	var data = [], record = {};
+	for(i=12; i>=0; i--) {
+		record = { timestamp: days_ago((10 * i) + (10 * Math.random())),
+							 marijuanas: i % 7 };
+		data.push(record);
+	}
+
+	var svg = dimple.newSvg("#graph", 600, 600);
+	var chart = new dimple.chart(svg, data);
+	chart.setBounds(50, 50, 450, 450);
+
+	// establish axes
+	var xAxis = chart.addTimeAxis("x", "timestamp", null, "%e %B %Y");
+	var yAxis = chart.addMeasureAxis("y", "marijuanas");
+
+	// create series
+	var lines = chart.addSeries(null, dimple.plot.area)
+
+	// style
+	lines.lineMarkers = true;
+
+	// render
+	chart.draw();
+
+</script>
+</body>
+</html>
