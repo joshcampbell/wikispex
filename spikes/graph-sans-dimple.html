@@ -13,6 +13,7 @@ body {
 .axis line {
   fill: none;
   stroke: #000;
+	stroke-width: 1px;
   shape-rendering: crispEdges;
 }
 
@@ -20,13 +21,13 @@ body {
   fill: #AAAAAA;
 }
 
-path.scatter-triangle-up {
+path.scatter.triangle-up {
 	fill: greenyellow;
 	stroke: green;
 	stroke-width: 1px;
 }
 
-path.scatter-triangle-down {
+path.scatter.triangle-down {
 	fill: pink;
 	stroke: red;
 	stroke-width: 1px;
@@ -35,6 +36,8 @@ path.scatter-triangle-down {
 </style>
 </head>
 <body>
+<a href="javascript:hideSomeDays();">Hide some Days</a>
+<a href="javascript:showSomeDays();">Show some Days</a>
 <script type="text/coffeescript">
 # adapted from http://bl.ocks.org/mbostock/3883195
 class AreaGraph
@@ -63,6 +66,19 @@ class AreaGraph
             .attr("height", @height + @margin.top + @margin.bottom)
             .append("g")
             .attr("transform", "translate(#{@margin.left}, #{@margin.top})")
+    @svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0, #{height})") # move to the bottom
+        .call(@xAxis)
+    @svg.append("g")
+        .attr("class", "y axis")
+        .call(@yAxis)
+    @svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 1) # ????
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Marijuanas")
     @svg.append("path")
         .datum(@dataSet.data)
         .attr("class", "area")
@@ -73,7 +89,6 @@ class AreaGraph
         .attr("d", @lineplot)
         .attr("fill", "none")
     pointShape = (marijuana, last_marijuana) ->
-      console.log(arguments)
       return "square" if(marijuana == last_marijuana) 
       return "triangle-down" if(marijuana < last_marijuana)
       return "triangle-up"
@@ -81,23 +96,19 @@ class AreaGraph
       symbolShape = pointShape(d.marijuanas, @dataSet.data[index-1]?.marijuanas)
       @svg.append("path")
         .datum(d)
-        .attr("class", "scatter-#{symbolShape}")
+        .attr("class", "scatter #{symbolShape}")
         .attr("d", @scatterplot.type(symbolShape))
         .attr("transform", (d) => "translate(#{@x(d.timestamp)}, #{@y(d.marijuanas)})")
-    @svg.append("g")
-        .attr("class", "x-axis")
-        .attr("transform", "translate(0, #{height})") # move to the bottom
-        .call(@xAxis)
-    @svg.append("g")
-        .attr("class", "y-axis")
-        .call(@yAxis)
-    @svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 1) # ????
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Marijuanas")
-  
+        .on("mousedown", (d) -> alert("#{d.marijuanas} marijuanas"))
+		window.hideSomeDays = =>
+			d3.selectAll("path.scatter")
+				.filter((d) -> d.marijuanas < 3 )
+				.attr("visibility", "hidden")
+		window.showSomeDays = =>
+			d3.selectAll("path.scatter")
+				.attr("visibility", "visible")
+		
+
 class AreaGraph.DataSet
   constructor: (@data, @categoryName, @valueName) ->
   getCategory: (d) => d[@categoryName]
