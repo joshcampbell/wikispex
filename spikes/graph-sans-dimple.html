@@ -17,7 +17,19 @@ body {
 }
 
 .area {
-  fill: lightblue;
+  fill: #AAAAAA;
+}
+
+path.scatter-triangle-up {
+	fill: greenyellow;
+	stroke: green;
+	stroke-width: 1px;
+}
+
+path.scatter-triangle-down {
+	fill: pink;
+	stroke: red;
+	stroke-width: 1px;
 }
 
 </style>
@@ -26,85 +38,90 @@ body {
 <script type="text/coffeescript">
 # adapted from http://bl.ocks.org/mbostock/3883195
 class AreaGraph
-	constructor: (@dataSet, @height, @width) ->
-		@margin = { top: 30, right: 30, left: 30, bottom: 30 }
-		@x = d3.time.scale()
-				  .range([0, @width])		
-					.domain(d3.extent(@dataSet.data, @dataSet.getCategory))
-		@y = d3.scale.linear()
-					.range([@height, 0])
-					.domain([0, d3.max(@dataSet.data, @dataSet.getValue)])
-		@xAxis = d3.svg.axis().scale(@x).orient("bottom")
-		@yAxis = d3.svg.axis().scale(@y).orient("left")
-		@areaplot = d3.svg.area()
-							.x((d) => @x(@dataSet.getCategory(d)))
-							.y0(@height)
-							.y1((d) => @y(@dataSet.getValue(d)))
-							.interpolate("monotone")
-		@lineplot = d3.svg.line()
-							.x((d) => @x(@dataSet.getCategory(d)))
-							.y((d) => @y(@dataSet.getValue(d)))
-							.interpolate("monotone")
-		@scatterplot = d3.svg.symbol()
-		@svg = d3.select("body").append("svg")
-						.attr("width", @width + @margin.left + @margin.right)
-						.attr("height", @height + @margin.top + @margin.bottom)
-						.append("g")
-						.attr("transform", "translate(#{@margin.left}, #{@margin.top})")
-		@svg.append("path")
-				.datum(@dataSet.data)
-				.attr("class", "area")
-				.attr("d", @areaplot)
-		@svg.append("path")
-				.datum(@dataSet.data)
-				.attr("class", "line")
-				.attr("d", @lineplot)
-				.attr("stroke", "steelblue")
-				.attr("fill", "none")
-		for d in @dataSet.data
-  		@svg.append("path")
-  				.datum(d)
-  				.attr("class", "scatter")
-  				.attr("d", @scatterplot)
-					.attr("transform", (d) => "translate(#{@x(d.timestamp)}, #{@y(d.marijuanas)})")
-		@svg.append("g")
-				.attr("class", "x-axis")
-				.attr("transform", "translate(0, #{height})") # move to the bottom
-				.call(@xAxis)
-		@svg.append("g")
-				.attr("class", "y-axis")
-				.call(@yAxis)
-		@svg.append("text")
-				.attr("transform", "rotate(-90)")
-				.attr("y", 1) # ????
-				.attr("dy", ".71em")
-				.style("text-anchor", "end")
-				.text("Marijuanas")
+  constructor: (@dataSet, @height, @width) ->
+    @margin = { top: 30, right: 30, left: 30, bottom: 30 }
+    @x = d3.time.scale()
+          .range([0, @width])    
+          .domain(d3.extent(@dataSet.data, @dataSet.getCategory))
+    @y = d3.scale.linear()
+          .range([@height, 0])
+          .domain([0, d3.max(@dataSet.data, @dataSet.getValue)])
+    @xAxis = d3.svg.axis().scale(@x).orient("bottom")
+    @yAxis = d3.svg.axis().scale(@y).orient("left")
+    @areaplot = d3.svg.area()
+              .x((d) => @x(@dataSet.getCategory(d)))
+              .y0(@height)
+              .y1((d) => @y(@dataSet.getValue(d)))
+              .interpolate("monotone")
+    @lineplot = d3.svg.line()
+              .x((d) => @x(@dataSet.getCategory(d)))
+              .y((d) => @y(@dataSet.getValue(d)))
+              .interpolate("monotone")
+    @scatterplot = d3.svg.symbol()
+    @svg = d3.select("body").append("svg")
+            .attr("width", @width + @margin.left + @margin.right)
+            .attr("height", @height + @margin.top + @margin.bottom)
+            .append("g")
+            .attr("transform", "translate(#{@margin.left}, #{@margin.top})")
+    @svg.append("path")
+        .datum(@dataSet.data)
+        .attr("class", "area")
+        .attr("d", @areaplot)
+    @svg.append("path")
+        .datum(@dataSet.data)
+        .attr("class", "line")
+        .attr("d", @lineplot)
+        .attr("fill", "none")
+    pointShape = (marijuana, last_marijuana) ->
+      console.log(arguments)
+      return "square" if(marijuana == last_marijuana) 
+      return "triangle-down" if(marijuana < last_marijuana)
+      return "triangle-up"
+    for d, index in @dataSet.data
+      symbolShape = pointShape(d.marijuanas, @dataSet.data[index-1]?.marijuanas)
+      @svg.append("path")
+        .datum(d)
+        .attr("class", "scatter-#{symbolShape}")
+        .attr("d", @scatterplot.type(symbolShape))
+        .attr("transform", (d) => "translate(#{@x(d.timestamp)}, #{@y(d.marijuanas)})")
+    @svg.append("g")
+        .attr("class", "x-axis")
+        .attr("transform", "translate(0, #{height})") # move to the bottom
+        .call(@xAxis)
+    @svg.append("g")
+        .attr("class", "y-axis")
+        .call(@yAxis)
+    @svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 1) # ????
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Marijuanas")
   
 class AreaGraph.DataSet
-	constructor: (@data, @categoryName, @valueName) ->
-	getCategory: (d) => d[@categoryName]
-	getValue:		 (d) => d[@valueName]
+  constructor: (@data, @categoryName, @valueName) ->
+  getCategory: (d) => d[@categoryName]
+  getValue:     (d) => d[@valueName]
 
 window.AreaGraph = AreaGraph
 </script>
 <script type="text/coffeescript">
 `
   // create some sample data
-	var days_ago = function(days){
-		ms_offset = 86400000 * days
-		return new Date((new Date() - ms_offset))
+  var days_ago = function(days){
+    ms_offset = 86400000 * days
+    return new Date((new Date() - ms_offset))
   }
-	var data = [], record = {};
-	for(i=12; i>=0; i--) {
-		record = { timestamp: days_ago((10 * i) + (10 * Math.random())),
-							 marijuanas: i % 7 };
-		data.push(record);
-	}
+  var data = [], record = {};
+  for(i=12; i>=0; i--) {
+    record = { timestamp: days_ago((10 * i) + (10 * Math.random())),
+               marijuanas: i % 7 };
+    data.push(record);
+  }
 
-	// graph it up
-	window.dataSet = new AreaGraph.DataSet(data, "timestamp", "marijuanas")
-	window.graph = new AreaGraph(dataSet, 500, 500)
+  // graph it up
+  window.dataSet = new AreaGraph.DataSet(data, "timestamp", "marijuanas")
+  window.graph = new AreaGraph(dataSet, 500, 500)
 `
 </script>
 </body>
