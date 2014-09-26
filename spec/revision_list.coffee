@@ -1,3 +1,4 @@
+require "./spec_helper.coffee"
 RevisionList = require "../src/model/revision_list.coffee"
 
 describe "RevisionList", ->

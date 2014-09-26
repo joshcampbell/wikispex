@@ -1,3 +1,4 @@
+require "./spec_helper.coffee"
 RevisionQuery = require "../src/query/revision_query.coffee"
 
 fixtures = {}

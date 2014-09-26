@@ -1,5 +1,5 @@
 require "./spec_helper.coffee"
-Query = require "../src/query/query.coffee"
+Query = require_source "query/query.coffee"
 
 describe "Query", ->
 
