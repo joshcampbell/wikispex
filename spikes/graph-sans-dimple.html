@@ -44,7 +44,7 @@ class AreaGraph
   constructor: (@dataSet, @height, @width) ->
     @margin = { top: 30, right: 30, left: 30, bottom: 30 }
     @x = d3.time.scale()
-          .range([0, @width])    
+          .range([0, @width])
           .domain(d3.extent(@dataSet.data, @dataSet.getCategory))
     @y = d3.scale.linear()
           .range([@height, 0])
