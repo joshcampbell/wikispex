@@ -18,6 +18,7 @@ gulp.task("tdd", function(){
 gulp.task("test", function(){
   return gulp.src(SPEC_FILES)
     .pipe(mocha({reporter: 'spec'}))
+    .on('error', gutil.log)
 })
 
 gulp.task('serve', ['build', 'start-server', 'watch'])
