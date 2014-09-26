@@ -1,4 +1,4 @@
-RevisionList = require "../src/revision_list.coffee"
+RevisionList = require "../src/model/revision_list.coffee"
 
 describe "RevisionList", ->
   beforeEach ->

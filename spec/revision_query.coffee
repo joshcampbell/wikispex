@@ -1,4 +1,4 @@
-RevisionQuery = require "../src/revision_query.coffee"
+RevisionQuery = require "../src/query/revision_query.coffee"
 
 fixtures = {}
 fixtures.first_response = require "./charizard.json"
