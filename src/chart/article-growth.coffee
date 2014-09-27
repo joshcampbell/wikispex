@@ -39,7 +39,6 @@ class ArticleGrowth
   setData: (data) -> @data = _.sortBy(data, "timestamp")
 
 class ArticleGrowth.Axes
-  # TODO: This should probably be two classes.
   constructor: (@scales) ->
   x: => d3.svg.axis().scale(@scales.x).orient("bottom")
   y: => d3.svg.axis().scale(@scales.y).orient("left")
@@ -72,14 +71,16 @@ class ArticleGrowth.ScatterPlot
 
   #FIXME: the skip_consolidation flag exists purely for testing purposes and is
   #       indicative of a malformed object graph -- this object needs to know
-  #       too much about the article growth chart.
+  #       too much about the article growth chart. I think that it's probably
+  #       best to pass around a full ChartData object? Something containing the
+  #       data points as well as the scales.
   constructor: (@scales, @data, skip_consolidation=false) ->
     unless skip_consolidation
       # calculate the minimum distance between plotted points in milliseconds
       # and use them to consolidate the data points.
       min_distance_px = 15
       min_distance = @scales.x.invert(min_distance_px) - @scales.x.domain()[0]
-      @data = ArticleGrowth.ScatterPlot.ConsolidatedData(@data, min_distance, @xField)
+      @data = ArticleGrowth.ScatterPlot.ConsolidatedData(@data, min_distance, @xField, @yField, convert_to_date: true)
 
   render: (@target) =>
     # TODO: I think it may be more idiomatic to use enter() instead of a
@@ -100,13 +101,20 @@ class ArticleGrowth.ScatterPlot
     "translate(#{@scales.x(d[@xField])}, #{@scales.y(d[@yField])})"
 
   _shape: (d, previous) =>
+    return "circle" if d.consolidated?
     return "square" if(d[@yField] == previous[@yField])
     return "triangle-down" if(d[@yField] < previous[@yField])
     return "triangle-up"
 
-ArticleGrowth.ScatterPlot.ConsolidatedData = (data, min_distance, xField) ->
+class ArticleGrowth.ScatterPlot.Tooltip
+
+
+ArticleGrowth.ScatterPlot.ConsolidatedData = (data, min_distance, xField, yField, options={}) ->
+  # FIXME: crying out for decomposition
+  convert_to_date = options.convert_to_date
   consolidated_data = []
   previous = {}
+  # replace points that are too close together with aggregates
   for d, index in data
     difference = d[xField] - previous[xField]
     if !isNaN(difference) && difference < min_distance
@@ -118,9 +126,18 @@ ArticleGrowth.ScatterPlot.ConsolidatedData = (data, min_distance, xField) ->
     else
       consolidated_data.push(d)
       previous = d
+  # make another pass to average the positions of the aggregates
+  _.each(consolidated_data, (d) ->
+    if d.consolidated?
+      d[xField] = _.chain(d.consolidated)
+                          .pluck(xField)
+                          .map((x) -> if convert_to_date then x.getTime() else x)
+                          .reduce((sum, x) -> sum + x)
+                          .value() / d.consolidated.length
+      d[xField] = new Date(d[xField]) if convert_to_date
+  )
   consolidated_data
     
-
 class ArticleGrowth.AreaPlot
   xField: "timestamp"
   yField: "size"

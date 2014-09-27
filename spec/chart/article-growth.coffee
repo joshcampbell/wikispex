@@ -85,6 +85,9 @@ describe "Article Growth Plots", ->
       it "provides access to the the original data points", ->
         assert.equal(@subject[1].consolidated.length, 3)
 
+      it "averages the x values of its constituent data points", ->
+        assert.equal(@subject[1].x, 101)
+
     describe "when merge zones abut", ->
 
       beforeEach ->
@@ -102,3 +105,15 @@ describe "Article Growth Plots", ->
       it "provides access to the original data points", ->
         consolidated_length = (d) -> d.consolidated?.length
         assert.deepEqual(_.map(@subject, consolidated_length), [2,2])
+
+    describe "date handling", ->
+
+      beforeEach ->
+        data = [
+          { time: new Date(), mullahs: 1 }
+          { time: new Date(new Date() - 500), mullahs: 2 }
+        ]
+        @subject = ArticleGrowth.ScatterPlot.ConsolidatedData(data, 2000, "time", "mullahs", convert_to_date: true)
+
+      it "yields aggregates whose x fields are dates", ->
+        assert(@subject[0].time instanceof Date)
