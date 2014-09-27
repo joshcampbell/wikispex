@@ -5,7 +5,8 @@ class ArticleGrowth
     top: 30
     bottom: 30
 
-  constructor:({@data, @height, @width, @xField, @yField})->
+  constructor:({data, @height, @width, @xField, @yField})->
+    @setData(data)
     @scales = {
       width: @width
       height: @height
@@ -34,6 +35,8 @@ class ArticleGrowth
     @axes.render(@svg)
     @scatterPlot.render(@svg)
     @
+
+  setData: (data) -> @data = _.sortBy(data, "timestamp")
 
 class ArticleGrowth.Axes
   # TODO: This should probably be two classes.
@@ -67,7 +70,12 @@ class ArticleGrowth.ScatterPlot
   xField: "timestamp"
   yField: "size"
 
-  constructor: (@scales, @data) ->
+  constructor: (@scales, data) ->
+    # calculate the minimum distance between plotted points in milliseconds
+    # and use them to consolidate the data points.
+    min_distance_px = 15
+    min_distance = @scales.x.invert(min_distance_px) - @scales.x.domain()[0]
+    @data = ArticleGrowth.ScatterPlot.ConsolidatedData(data, min_distance, @xField)
 
   render: (@target) =>
     # TODO: I think it may be more idiomatic to use enter() instead of a
@@ -91,6 +99,23 @@ class ArticleGrowth.ScatterPlot
     return "square" if(d[@yField] == previous[@yField])
     return "triangle-down" if(d[@yField] < previous[@yField])
     return "triangle-up"
+
+ArticleGrowth.ScatterPlot.ConsolidatedData = (data, min_distance, xField) ->
+  consolidated_data = []
+  previous = {}
+  for d, index in data
+    difference = d[xField] - previous[xField]
+    if !isNaN(difference) && difference < min_distance
+      if typeof previous.consolidated == "undefined"
+        consolidated = []
+        consolidated.push(_.clone(previous))
+        previous.consolidated = consolidated
+      previous.consolidated.push(d)
+    else
+      consolidated_data.push(d)
+      previous = d
+  consolidated_data
+    
 
 class ArticleGrowth.AreaPlot
   xField: "timestamp"

@@ -30,7 +30,7 @@ describe "Article Growth Plots", ->
       height: 1000
       width: 500
     @data = [
-      { timestamp: (new Date()), size: 5 } 
+      { timestamp: (new Date()), size: 5 }
       { timestamp: (new Date() - 100000), size: 10 }
     ]
 
@@ -70,6 +70,35 @@ describe "Article Growth Plots", ->
 
     describe "when data points are too close together", ->
 
+      beforeEach ->
+        data = [
+          { x: 50 }
+          { x: 100 }
+          { x: 101 }
+          { x: 102 }
+        ]
+        @subject = ArticleGrowth.ScatterPlot.ConsolidatedData(data, 3, "x")
+        
       it "merges them", ->
+        assert.equal(@subject.length, 2)
 
       it "provides access to the the original data points", ->
+        assert.equal(@subject[1].consolidated.length, 3)
+
+    describe "when merge zones abut", ->
+
+      beforeEach ->
+        data = [
+          { x: 1 }
+          { x: 2 }
+          { x: 3 }
+          { x: 4 }
+        ]
+        @subject = ArticleGrowth.ScatterPlot.ConsolidatedData(data, 2, "x")
+
+      it "consolidates them into areas of min_distance width", ->
+        assert.equal(@subject.length, 2)
+
+      it "provides access to the original data points", ->
+        consolidated_length = (d) -> d.consolidated?.length
+        assert.deepEqual(_.map(@subject, consolidated_length), [2,2])

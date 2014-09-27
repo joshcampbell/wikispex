@@ -2,6 +2,7 @@
 global.assert = require "assert"
 global.sinon = require "sinon"
 global.jsdom = require "jsdom"
+global._ = global.underscore = require "lodash"
 
 # helpers to avoid "../../../"
 require "../src/require_source.coffee"
