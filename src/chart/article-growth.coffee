@@ -70,12 +70,16 @@ class ArticleGrowth.ScatterPlot
   xField: "timestamp"
   yField: "size"
 
-  constructor: (@scales, data) ->
-    # calculate the minimum distance between plotted points in milliseconds
-    # and use them to consolidate the data points.
-    min_distance_px = 15
-    min_distance = @scales.x.invert(min_distance_px) - @scales.x.domain()[0]
-    @data = ArticleGrowth.ScatterPlot.ConsolidatedData(data, min_distance, @xField)
+  #FIXME: the skip_consolidation flag exists purely for testing purposes and is
+  #       indicative of a malformed object graph -- this object needs to know
+  #       too much about the article growth chart.
+  constructor: (@scales, @data, skip_consolidation=false) ->
+    unless skip_consolidation
+      # calculate the minimum distance between plotted points in milliseconds
+      # and use them to consolidate the data points.
+      min_distance_px = 15
+      min_distance = @scales.x.invert(min_distance_px) - @scales.x.domain()[0]
+      @data = ArticleGrowth.ScatterPlot.ConsolidatedData(@data, min_distance, @xField)
 
   render: (@target) =>
     # TODO: I think it may be more idiomatic to use enter() instead of a

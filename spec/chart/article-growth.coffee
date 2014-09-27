@@ -39,7 +39,7 @@ describe "Article Growth Plots", ->
     describe "#render", ->
   
       beforeEach ->
-        @subject = new ArticleGrowth.ScatterPlot(@scales, @data)
+        @subject = new ArticleGrowth.ScatterPlot(@scales, @data, true)
   
       it "uses the x scale", ->
         @subject.render(@svg)
