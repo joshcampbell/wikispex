@@ -1,5 +1,5 @@
 Spine = require "spine"
-Query = require_source "query/query"
+Query = require "./query"
 _ = require "lodash"
 
 class RevisionQuery extends Spine.Module

@@ -65,3 +65,11 @@ describe "Article Growth Plots", ->
         @subject.render(@svg)
         paths = @svg.selectAll("path")
         assert.equal(paths.size(), 1)
+
+  describe "Consolidated Revision Set", ->
+
+    describe "when data points are too close together", ->
+
+      it "merges them", ->
+
+      it "provides access to the the original data points", ->
