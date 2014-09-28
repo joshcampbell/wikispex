@@ -88,10 +88,15 @@ class ArticleGrowth.ScatterPlot
     for d, index in @data
       previous = @data[index - 1] || {}
       shape = @_shape(d, previous)
+      offset = @_offset(d)
       @target.append("path")
              .attr("class", "scatter #{shape}")
              .attr("d", @pathgen().type(shape))
-             .attr("transform", @_offset(d))
+             .attr("transform", offset)
+      if d.consolidated?
+        @target.append("text")
+         .attr("transform", offset)
+         .text(d.consolidated.length)
     @
 
   pathgen: =>
