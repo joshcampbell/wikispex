@@ -117,3 +117,17 @@ describe "Article Growth Plots", ->
 
       it "yields aggregates whose x fields are dates", ->
         assert(@subject[0].time instanceof Date)
+
+  describe "Tooltip", ->
+    describe "#render", ->
+      it "draws a box", ->
+      describe "when there is room on the right", ->
+        it "appears to the right of the cursor", ->
+      describe "when there isn't room on the right", ->
+        it "appears to the left of the cursor", ->
+  describe "Revision Summary Tooltip", ->
+    describe "#content", ->
+      it "shows the editor count", ->
+      it "shows the date range", ->
+      it "shows total diffs", ->
+
