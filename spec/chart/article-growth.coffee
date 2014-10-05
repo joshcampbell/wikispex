@@ -71,17 +71,21 @@ describe "Article Growth Plots", ->
     describe "when data points are too close together", ->
 
       beforeEach ->
-        data = [
+        @data = [
           { x: 50 }
           { x: 100 }
           { x: 101 }
           { x: 102 }
         ]
-        @subject = ArticleGrowth.ScatterPlot.ConsolidatedData(data, 3, "x")
-        
+        @subject = ArticleGrowth.ScatterPlot.ConsolidatedData(@data, 3, "x")
+
       it "merges them", ->
         assert.equal(@subject.length, 2)
 
+      it "doesn't mutate the data set you give it", ->
+        for d in @data
+          assert.equal(typeof d.consolidated, "undefined")
+        
       it "provides access to the the original data points", ->
         assert.equal(@subject[1].consolidated.length, 3)
 

@@ -5,7 +5,7 @@ class ArticleGrowth
     top: 30
     bottom: 30
 
-  constructor:({data, @height, @width, @xField, @yField})->
+  constructor: ({data, @height, @width, @xField, @yField})->
     @setData(data)
     @scales = {
       width: @width
@@ -21,8 +21,8 @@ class ArticleGrowth
     @el = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     @el.setAttribute("class", "chart article-growth")
     @axes = new ArticleGrowth.Axes(@scales)
-    @scatterPlot = new ArticleGrowth.ScatterPlot(@scales, @data)
     @areaPlot = new ArticleGrowth.AreaPlot(@scales, @data)
+    @scatterPlot = new ArticleGrowth.ScatterPlot(@scales, @data)
 
   render: ->
     @el.innerHTML = ""
@@ -78,7 +78,7 @@ class ArticleGrowth.ScatterPlot
     unless skip_consolidation
       # calculate the minimum distance between plotted points in milliseconds
       # and use them to consolidate the data points.
-      min_distance_px = 15
+      min_distance_px = 25
       min_distance = @scales.x.invert(min_distance_px) - @scales.x.domain()[0]
       @data = ArticleGrowth.ScatterPlot.ConsolidatedData(@data, min_distance, @xField, @yField, convert_to_date: true)
 
@@ -121,6 +121,7 @@ ArticleGrowth.ScatterPlot.ConsolidatedData = (data, min_distance, xField, yField
   previous = {}
   # replace points that are too close together with aggregates
   for d, index in data
+    d = _.clone(d)
     difference = d[xField] - previous[xField]
     if !isNaN(difference) && difference < min_distance
       if typeof previous.consolidated == "undefined"
