@@ -20,4 +20,6 @@ WS.adHocLiveIntegrationTest = ->
     xField: "timestamp"
     yField: "size"
   chart.render()
-  document.body.appendChild(chart.el) 
+  document.body.appendChild(chart.el)
+
+$ WS.adHocLiveIntegrationTest

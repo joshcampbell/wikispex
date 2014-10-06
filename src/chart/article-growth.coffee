@@ -91,6 +91,7 @@ class ArticleGrowth.ScatterPlot
       offset = @_offset(d)
       @target.append("path")
              .attr("class", "scatter #{shape}")
+             .attr("size", 100)
              .attr("d", @pathgen().type(shape))
              .attr("transform", offset)
       if d.consolidated?
